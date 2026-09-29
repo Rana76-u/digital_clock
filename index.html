@@ -16,7 +16,9 @@
   --display:"Sora","Plus Jakarta Sans","Segoe UI",system-ui,sans-serif;
   --body:"Plus Jakarta Sans","Segoe UI",system-ui,-apple-system,Arial,sans-serif;
   --bn:"Hind Siliguri","Noto Sans Bengali","Nirmala UI",system-ui,sans-serif;
+  --tshadow:0 6px 50px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.35);
 }
+body[data-mode="light"]{--tshadow:0 2px 30px rgba(255,255,255,.55)}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--body)}
 body.idle{cursor:none}
@@ -25,6 +27,7 @@ main *{transition:color 2s ease,background-color 2s ease,border-color 2s ease,bo
 /* backgrounds */
 .fallback{position:fixed;inset:0;background:linear-gradient(135deg,#0b1f2a,#14453f,#1b2b58,#0b1f2a);background-size:300% 300%;animation:drift 40s ease infinite}
 @keyframes drift{50%{background-position:100% 100%}}
+body[data-mode="light"] .fallback{background:linear-gradient(135deg,#e3edf3,#dcefe9,#e8e2f3,#e3edf3);background-size:300% 300%}
 .bg{position:fixed;inset:0;background:center/cover no-repeat;opacity:0;transition:opacity 2.5s ease;transform:scale(1.04)}
 .bg.on{opacity:1;animation:zoom 60s ease-out forwards}
 @keyframes zoom{to{transform:scale(1.12)}}
@@ -35,23 +38,23 @@ main{position:relative;height:100%;display:grid;grid-template-columns:1fr minmax
 .left{display:flex;flex-direction:column;justify-content:space-between;min-width:0}
 .glass{background:var(--glass);border:1px solid var(--line);border-radius:22px;backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3)}
 
-.top{display:flex;justify-content:space-between;align-items:center;gap:16px}
-.chip{display:inline-flex;align-items:center;gap:.6em;padding:.55em 1.1em;border-radius:99px;font-weight:700;font-size:clamp(13px,1.5vw,26px)}
-.dot{width:.6em;height:.6em;border-radius:50%;background:var(--acc);animation:pulse 2s infinite}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 16px}
+.chip{display:inline-flex;align-items:center;flex:none;white-space:nowrap;padding:.55em 1.1em;border-radius:99px;font-weight:700;font-size:clamp(13px,1.5vw,26px)}
+.dot{flex:none;margin-right:.7em;width:.6em;height:.6em;border-radius:50%;background:var(--acc);animation:pulse 2s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--acc) 70%,transparent)}70%,100%{box-shadow:0 0 0 .7em transparent}}
 .date{font-weight:800;font-size:clamp(16px,2.3vw,44px)}
 
-/* hero clock */
-.hero{padding:0 .5vw}
-.time{display:flex;align-items:flex-end;gap:1.2vw;font-family:var(--display);font-weight:800;line-height:.9;text-shadow:0 6px 50px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.35)}
-.hm{display:flex;font-size:min(19vw,40vh);letter-spacing:-.04em}
+/* hero clock: seconds + AM/PM sit above the clock, right-aligned; the clock fills the width */
+.hero{padding:0 .5vw;container-type:inline-size}
+.time{display:flex;flex-direction:column;align-items:flex-end;font-family:var(--display);font-weight:800;line-height:.9;text-shadow:var(--tshadow)}
+.meta{display:flex;align-items:baseline;justify-content:flex-end;line-height:1;margin-bottom:.4vh}
+.sec{font-size:min(6.5vw,12vh);color:var(--acc);display:flex}
+.ap{font-size:min(3.4vw,6.4vh);color:var(--sub);margin-left:clamp(8px,1.2vw,22px)}
+.hm{display:flex;font-size:min(22vw,42vh);font-size:min(34.5cqw,42vh);letter-spacing:-.04em}   /* 34.5cqw = clock exactly as wide as its column */
 .d{display:inline-block;width:.64em;text-align:center}
 .c{display:inline-block;width:.3em;text-align:center;transform:translateY(-.06em);animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:.25}}
-.side{display:flex;flex-direction:column;gap:.5vw;padding-bottom:1.2vw}
-.sec{font-size:min(7vw,15vh);color:var(--acc);display:flex}
-.ap{font-size:min(3.6vw,8vh);color:var(--sub)}
-.bar{margin-top:2vh;height:clamp(6px,.8vh,12px);border-radius:9px;background:color-mix(in srgb,var(--sub) 28%,transparent);overflow:hidden;max-width:64vw}
+.bar{margin-top:2vh;height:clamp(6px,.8vh,12px);border-radius:9px;background:color-mix(in srgb,var(--sub) 28%,transparent);overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:var(--acc);border-radius:9px}
 
 /* world clocks: the whole card is a live sky */
@@ -77,24 +80,24 @@ main{position:relative;height:100%;display:grid;grid-template-columns:1fr minmax
 .orb.moon .disc{box-shadow:none;-webkit-mask:radial-gradient(circle at 72% 36%,transparent 0 49%,#000 50%);mask:radial-gradient(circle at 72% 36%,transparent 0 49%,#000 50%)}
 .zc{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:space-between;min-width:0;
   padding:clamp(12px,1.3vw,24px) clamp(14px,1.8vw,30px);text-shadow:0 2px 14px rgba(0,0,0,.45)}
-.zhead{display:flex;align-items:center;gap:clamp(8px,1vw,16px)}
-.flag{width:clamp(32px,3.6vw,68px);flex:none;border-radius:6px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.5);line-height:0}
+.zhead{display:flex;align-items:center}
+.flag{width:clamp(32px,3.6vw,68px);flex:none;margin-right:clamp(8px,1vw,16px);border-radius:6px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.5);line-height:0}
 .flag svg{width:100%;height:auto;display:block}
-.zn{display:flex;flex-direction:column;line-height:1.2}
+.zn{display:flex;flex-direction:column;line-height:1.2;min-width:0;overflow-wrap:anywhere}
 .zn b{font-size:clamp(15px,1.9vw,34px);font-weight:800}
 .zn span{font-size:clamp(11px,1.15vw,20px);color:rgba(255,255,255,.9);font-weight:600}
-.zbot{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
-.zone .t{font-family:var(--display);font-weight:800;font-size:min(4.4vw,8.4vh);line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.zbot{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:6px 12px}
+.zone .t{white-space:nowrap;font-family:var(--display);font-weight:800;font-size:min(4.4vw,8.4vh);line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .zone .t small{font-size:.42em;font-weight:600;margin-left:.3em;color:rgba(255,255,255,.88)}
 .dn{font-family:var(--bn);font-weight:700;font-size:clamp(12px,1.35vw,24px);line-height:1.3;padding:.15em .9em;border-radius:99px;margin-bottom:.35em;white-space:nowrap;
   background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.38);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);text-shadow:none}
 
 /* prayers */
 .right{display:flex;flex-direction:column;gap:clamp(8px,1vw,16px);min-height:0}
-.rh{display:flex;justify-content:space-between;align-items:baseline;padding:0 .4em;font-family:var(--bn);font-weight:700;font-size:clamp(17px,2.1vw,38px);line-height:1.4}
+.rh{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;column-gap:.8em;padding:0 .4em;font-family:var(--bn);font-weight:700;font-size:clamp(17px,2.1vw,38px);line-height:1.4}
 .rh span{font-size:.6em;font-weight:500;color:var(--sub)}
 .p{position:relative;flex:1;min-height:0;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;align-content:center;align-items:center;
-  padding:0 clamp(14px,1.6vw,28px);overflow:hidden;transition:opacity .5s ease,color 2s ease,background-color 2s ease,border-color 2s ease,box-shadow 2s ease}
+  padding:0 clamp(14px,1.6vw,28px);column-gap:12px;overflow:hidden;transition:opacity .5s ease,color 2s ease,background-color 2s ease,border-color 2s ease,box-shadow 2s ease}
 .bnm{grid-row:1;grid-column:1;font-family:var(--bn);font-weight:700;font-size:min(3vw,5.2vh);line-height:1.4;color:var(--ink)}
 .tm{grid-row:1;grid-column:2;justify-self:end;font-family:var(--display);font-weight:800;font-size:min(3.1vw,5.6vh);line-height:1.1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
 .tm small{font-size:.4em;font-weight:600;color:var(--sub);margin-left:.25em}
@@ -113,13 +116,18 @@ main{position:relative;height:100%;display:grid;grid-template-columns:1fr minmax
 .p.nxt .bnm,.p.nxt .tm,.p.nxt .st{color:var(--acc)}
 .p.nxt .st{display:block}
 
-.credit{position:fixed;left:14px;bottom:8px;font-size:11px;color:rgba(255,255,255,.5);pointer-events:none}
+.credit{position:fixed;left:14px;bottom:8px;font-size:11px;color:color-mix(in srgb,var(--ink) 55%,transparent);pointer-events:none}
 
 @media (max-aspect-ratio:1/1){
   main{grid-template-columns:1fr;overflow:auto}
   html,body{overflow:auto}
-  .hm{font-size:22vw}.sec{font-size:9vw}.p{padding:8px 16px;min-height:84px}
+  .hm{font-size:22vw;font-size:34.5cqw}
+  .sec{font-size:clamp(28px,9vw,72px)}.ap{font-size:clamp(16px,4.6vw,36px)}
+  .p{padding:8px 16px;min-height:84px}
+  .bnm,.tm{font-size:clamp(18px,5vw,32px)}.en{font-size:clamp(11px,2.8vw,16px)}.st{font-size:clamp(12px,3vw,18px)}
+  .zone .t{font-size:clamp(26px,7vw,64px)}.zn b{font-size:clamp(16px,4vw,30px)}
 }
+@media (max-width:560px){.world{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){.bg.on,.fallback,.c,.dot,.cloud,.stars i{animation:none}}
 </style>
 </head>
@@ -134,8 +142,8 @@ main{position:relative;height:100%;display:grid;grid-template-columns:1fr minmax
     </div>
     <div class="hero">
       <div class="time">
+        <div class="meta"><div class="sec" id="sec"></div><div class="ap" id="ap"></div></div>
         <div class="hm" id="hm"></div>
-        <div class="side"><div class="sec" id="sec"></div><div class="ap" id="ap"></div></div>
       </div>
       <div class="bar"><i id="secbar"></i></div>
     </div>
@@ -163,11 +171,12 @@ const FAJR_ANGLE = 18, ISHA_ANGLE = 18, ASR_FACTOR = 2;      // ASR_FACTOR 2 = H
 const OFFSETS = { Fajr:0, Dhuhr:0, Asr:0, Maghrib:0, Isha:0 };
 // Time-of-day palettes. scrim = how strongly the palette background covers the photo (1 = solid, no photo).
 const PHASES = {
-  dawn:    { bg:"#1C2331", ink:"#F4C430", sub:"#A0A0C0", acc:"#E07A5F", scrim:.78 },  // Fajr → sunrise
-  morning: { bg:"#121A21", ink:"#F8F9FA", sub:"#4EA8DE", acc:"#FFB703", scrim:.72 },  // sunrise → Dhuhr
-  midday:  { bg:"#0B0F19", ink:"#FFFFFF", sub:"#00B4D8", acc:"#2A9D8F", scrim:.80 },  // Dhuhr → Maghrib
-  dusk:    { bg:"#1A1423", ink:"#F3E9DC", sub:"#E07A5F", acc:"#D97706", scrim:.78 },  // Maghrib → Isha
-  night:   { bg:"#000000", ink:"#D4A373", sub:"#8A8A8A", acc:"#B5838D", scrim:1   }   // Isha → Fajr (pure black)
+  // mode: "dark" or "light" theme. onacc = text colour on the solid accent card (defaults to bg).
+  dawn:    { bg:"#1C2331", ink:"#F4C430", sub:"#A0A0C0", acc:"#E07A5F", scrim:.78, mode:"dark"  },  // Fajr → sunrise
+  morning: { bg:"#FBF1E1", ink:"#22180C", sub:"#8A5200", acc:"#B45F06", onacc:"#FFF8EC", scrim:.84, mode:"light" },  // sunrise → Dhuhr (warm light)
+  midday:  { bg:"#EEF6F8", ink:"#0B1B22", sub:"#0A6A80", acc:"#0F766E", onacc:"#F2FFFD", scrim:.84, mode:"light" },  // Dhuhr → Maghrib (cool light)
+  dusk:    { bg:"#1A1423", ink:"#F3E9DC", sub:"#E07A5F", acc:"#D97706", scrim:.78, mode:"dark"  },  // Maghrib → Isha
+  night:   { bg:"#000000", ink:"#D4A373", sub:"#8A8A8A", acc:"#B5838D", scrim:1,   mode:"dark"  }   // Isha → Fajr (pure black)
 };
 const PEXELS_KEY = "EhJqyFqKU77REnkXo236KLSTogNhrIOjP7pQMHBF5dFiEwtyGwlCckpX";
 const PEXELS_QUERIES = ["nature landscape","mountains sunrise","ocean sunset","misty forest","night sky","city skyline"];
@@ -197,7 +206,7 @@ function prayerTimes(y,m,d){
   const min = h => Math.round(fix(h+adj,24)*60);
   return { list: raw.map((h,i)=> min(h)+OFFSETS[PRAYERS[i][0]]), sunrise: min(at(.833,6/24,-1)) };
 }
-const to12 = mins => { const h=Math.floor(mins/60)%24, m=mins%60; return [`${h%12||12}:${String(m).padStart(2,"0")}`, h>=12?"PM":"AM"] };
+const to12 = mins => { const h=Math.floor(mins/60)%24, m=mins%60; return [`${String(h%12||12).padStart(2,"0")}:${String(m).padStart(2,"0")}`, h>=12?"PM":"AM"] };
 
 /* ---------- build UI ---------- */
 const FLAGS = {
@@ -237,8 +246,8 @@ function applyPhase(name){
   if(name===phase) return; phase=name;
   const p=PHASES[name], s=document.documentElement.style;
   s.setProperty("--bg",p.bg); s.setProperty("--ink",p.ink); s.setProperty("--sub",p.sub);
-  s.setProperty("--acc",p.acc); s.setProperty("--onacc",p.bg); s.setProperty("--scrim",p.scrim);
-  document.body.dataset.phase=name;
+  s.setProperty("--acc",p.acc); s.setProperty("--onacc",p.onacc||p.bg); s.setProperty("--scrim",p.scrim);
+  document.body.dataset.phase=name; document.body.dataset.mode=p.mode||"dark";
 }
 addEventListener("keydown",e=>{ if(e.key.toLowerCase()==="p"){           // press P to preview each palette
   const k=Object.keys(PHASES), i=forced?k.indexOf(forced)+1:0; forced = i>=k.length?null:k[i]; tick(); } });
@@ -249,7 +258,7 @@ function wall(tz,now){ const p=Object.fromEntries(fmt(tz,{hour:"2-digit",minute:
   return { y:+p.year, mo:+p.month, d:+p.day, h:+p.hour%24, mi:+p.minute, s:+p.second } }
 function tick(){
   const now=new Date(), w=wall(HOME,now), ms=now.getMilliseconds();
-  const hm=`${w.h%12||12}:${two(w.mi)}`;
+  const hm=`${two(w.h%12||12)}:${two(w.mi)}`;
   if($("hm").dataset.v!==hm){ $("hm").dataset.v=hm; $("hm").innerHTML=digits(hm); }
   $("sec").innerHTML=digits(two(w.s));
   $("ap").textContent=w.h>=12?"PM":"AM";
@@ -257,7 +266,7 @@ function tick(){
   $("date").textContent=fmt(HOME,{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(now);
 
   ZONES.forEach((z,i)=>{ const t=wall(z.tz,now);
-    $("zt"+i).innerHTML=`${t.h%12||12}:${two(t.mi)}<small>${t.h>=12?"PM":"AM"}</small>`;
+    $("zt"+i).innerHTML=`${two(t.h%12||12)}:${two(t.mi)}<small>${t.h>=12?"PM":"AM"}</small>`;
     const hf=t.h+t.mi/60, isSun=hf>=6&&hf<18;
     const tt=isSun?(hf-6)/12:((hf-18+24)%24)/12, hgt=Math.sin(Math.PI*tt);
     const sk=skyAt(hf), so=starsOp(hf), el=$("zone"+i), orb=$("orb"+i);

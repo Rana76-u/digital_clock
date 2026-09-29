@@ -6,14 +6,14 @@ No build step, no framework, no server. Open the HTML file in a browser.
 
 ## Features
 
-- **Big Dhaka clock.** Hours and minutes in heavy Sora numerals, with seconds, AM/PM, the full date and a live seconds bar.
+- **Big Dhaka clock.** Hours and minutes in heavy Sora numerals that fill the full width of the main column, always with a leading zero (02:39). Seconds and AM/PM sit above the clock on the right, with the full date and a live seconds bar.
 - **Five prayer times, Bangla first.** ফজর, যোহর, আসর, মাগরিব and এশা are the main labels, with English underneath.
   - The prayer running now is a solid filled card ("এখন চলছে") with a progress bar.
   - The next prayer has a glowing outline and a live countdown ("পরবর্তী · বাকি hh:mm:ss").
   - Prayers that have passed are dimmed.
 - **Prayer times calculated offline.** No API is needed, so they always show, even with no internet.
 - **Two world clocks.** Nova Scotia (Canadian flag) and London (UK flag) by default. Each card is a live sky that blends from night to sunrise, day, sunset and back, with a moving sun or moon, stars, drifting clouds and a small দিন / রাত / ভোর / সন্ধ্যা label.
-- **Time-of-day colour palette.** The whole page shifts through five palettes (dawn, morning, midday, dusk, night) that follow the real prayer times. Night is pure black.
+- **Time-of-day theme.** The whole page shifts through five palettes that follow the real prayer times: dark at dawn, a warm light theme in the morning, a cool light theme at midday, dark at dusk, and pure black at night.
 - **Photo backgrounds.** Random landscape photos crossfade every 10 minutes, with a gradient fallback if none can load.
 - **Display-friendly extras.** Full-screen toggle, hidden mouse cursor when idle, and the screen is kept awake where the browser allows it.
 
@@ -71,13 +71,15 @@ Built-in flags are `ca` (Canada) and `uk` (United Kingdom). For another country,
 
 ## Colour phases
 
-| Phase | Runs from → to | Background | Time | Secondary | Accent |
-|---|---|---|---|---|---|
-| Dawn | Fajr → sunrise | `#1C2331` | `#F4C430` | `#A0A0C0` | `#E07A5F` |
-| Morning | Sunrise → Dhuhr | `#121A21` | `#F8F9FA` | `#4EA8DE` | `#FFB703` |
-| Midday | Dhuhr → Maghrib | `#0B0F19` | `#FFFFFF` | `#00B4D8` | `#2A9D8F` |
-| Dusk | Maghrib → Isha | `#1A1423` | `#F3E9DC` | `#E07A5F` | `#D97706` |
-| Night | Isha → Fajr | `#000000` | `#D4A373` | `#8A8A8A` | `#B5838D` |
+| Phase | Theme | Runs from → to | Background | Time | Secondary | Accent |
+|---|---|---|---|---|---|---|
+| Dawn | Dark | Fajr → sunrise | `#1C2331` | `#F4C430` | `#A0A0C0` | `#E07A5F` |
+| Morning | Light (warm) | Sunrise → Dhuhr | `#FBF1E1` | `#22180C` | `#8A5200` | `#B45F06` |
+| Midday | Light (cool) | Dhuhr → Maghrib | `#EEF6F8` | `#0B1B22` | `#0A6A80` | `#0F766E` |
+| Dusk | Dark | Maghrib → Isha | `#1A1423` | `#F3E9DC` | `#E07A5F` | `#D97706` |
+| Night | Dark | Isha → Fajr | `#000000` | `#D4A373` | `#8A8A8A` | `#B5838D` |
+
+Each entry in `PHASES` also has a `mode` (`"dark"` or `"light"`) and an optional `onacc`, the text colour used on the solid "running now" card.
 
 The night secondary colour is lighter than a typical dark gray so small text stays readable on black from a distance.
 
