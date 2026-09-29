@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bangladesh Clock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;800&family=Plus+Jakarta+Sans:wght@500;700;800&family=Hind+Siliguri:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* palette variables are set live by the script (see PHASES below) */
+  --bg:#0B0F19; --ink:#fff; --sub:#00B4D8; --acc:#2A9D8F; --onacc:#0B0F19; --scrim:.8;
+  --glass:color-mix(in srgb,var(--bg) 58%,transparent);
+  --line:color-mix(in srgb,var(--sub) 38%,transparent);
+  --display:"Sora","Plus Jakarta Sans","Segoe UI",system-ui,sans-serif;
+  --body:"Plus Jakarta Sans","Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+  --bn:"Hind Siliguri","Noto Sans Bengali","Nirmala UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--body)}
+body.idle{cursor:none}
+main *{transition:color 2s ease,background-color 2s ease,border-color 2s ease,box-shadow 2s ease}
+
+/* backgrounds */
+.fallback{position:fixed;inset:0;background:linear-gradient(135deg,#0b1f2a,#14453f,#1b2b58,#0b1f2a);background-size:300% 300%;animation:drift 40s ease infinite}
+@keyframes drift{50%{background-position:100% 100%}}
+.bg{position:fixed;inset:0;background:center/cover no-repeat;opacity:0;transition:opacity 2.5s ease;transform:scale(1.04)}
+.bg.on{opacity:1;animation:zoom 60s ease-out forwards}
+@keyframes zoom{to{transform:scale(1.12)}}
+.scrim{position:fixed;inset:0;background:var(--bg);opacity:var(--scrim);transition:background-color 2s ease,opacity 2s ease}
+
+/* layout */
+main{position:relative;height:100%;display:grid;grid-template-columns:1fr minmax(290px,29vw);gap:clamp(14px,2vw,36px);padding:clamp(14px,2.4vw,40px)}
+.left{display:flex;flex-direction:column;justify-content:space-between;min-width:0}
+.glass{background:var(--glass);border:1px solid var(--line);border-radius:22px;backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3)}
+
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.chip{display:inline-flex;align-items:center;gap:.6em;padding:.55em 1.1em;border-radius:99px;font-weight:700;font-size:clamp(13px,1.5vw,26px)}
+.dot{width:.6em;height:.6em;border-radius:50%;background:var(--acc);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--acc) 70%,transparent)}70%,100%{box-shadow:0 0 0 .7em transparent}}
+.date{font-weight:800;font-size:clamp(16px,2.3vw,44px)}
+
+/* hero clock */
+.hero{padding:0 .5vw}
+.time{display:flex;align-items:flex-end;gap:1.2vw;font-family:var(--display);font-weight:800;line-height:.9;text-shadow:0 6px 50px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.35)}
+.hm{display:flex;font-size:min(19vw,40vh);letter-spacing:-.04em}
+.d{display:inline-block;width:.64em;text-align:center}
+.c{display:inline-block;width:.3em;text-align:center;transform:translateY(-.06em);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:.25}}
+.side{display:flex;flex-direction:column;gap:.5vw;padding-bottom:1.2vw}
+.sec{font-size:min(7vw,15vh);color:var(--acc);display:flex}
+.ap{font-size:min(3.6vw,8vh);color:var(--sub)}
+.bar{margin-top:2vh;height:clamp(6px,.8vh,12px);border-radius:9px;background:color-mix(in srgb,var(--sub) 28%,transparent);overflow:hidden;max-width:64vw}
+.bar i{display:block;height:100%;width:0;background:var(--acc);border-radius:9px}
+
+/* world clocks: the whole card is a live sky */
+.world{display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,1.6vw,28px)}
+.zone{--sk1:#1d63c2;--sk2:#63b3ee;--cl:.5;position:relative;overflow:hidden;isolation:isolate;display:flex;
+  min-height:clamp(120px,21vh,230px);background:linear-gradient(180deg,var(--sk1),var(--sk2));color:#fff}
+.sky,.shade{position:absolute;inset:0}
+.sky{z-index:0;overflow:hidden}
+.shade{z-index:1;background:linear-gradient(90deg,rgba(3,10,36,.42),rgba(3,10,36,.08) 72%),linear-gradient(0deg,rgba(3,10,36,.25),transparent 55%)}
+.stars{position:absolute;inset:0;opacity:0;transition:opacity 2s ease}
+.stars i{position:absolute;border-radius:50%;background:#fff;animation:tw 4s ease-in-out infinite}
+@keyframes tw{50%{opacity:.3}}
+.cloud{position:absolute;border-radius:50%;background:rgba(255,255,255,.9);filter:blur(14px);opacity:var(--cl);animation:drift2 80s ease-in-out infinite alternate}
+.c1{width:34%;height:26%;top:6%;left:4%}
+.c2{width:42%;height:22%;top:44%;left:48%;animation-duration:110s}
+.c3{width:26%;height:20%;top:16%;left:62%;animation-duration:95s;animation-direction:alternate-reverse}
+@keyframes drift2{to{transform:translateX(16%)}}
+.orb{position:absolute;width:0;height:0;transition:left .5s linear,top .5s linear}
+.orb .glow{position:absolute;left:50%;top:50%;width:clamp(130px,17vw,320px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,color-mix(in srgb,var(--oc,#fff) 75%,transparent),transparent 66%);opacity:.8}
+.orb .disc{position:absolute;left:50%;top:50%;width:clamp(26px,2.9vw,54px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:var(--oc,#fff);box-shadow:0 0 22px var(--oc,#fff)}
+.orb.moon .glow{opacity:.32}
+.orb.moon .disc{box-shadow:none;-webkit-mask:radial-gradient(circle at 72% 36%,transparent 0 49%,#000 50%);mask:radial-gradient(circle at 72% 36%,transparent 0 49%,#000 50%)}
+.zc{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:space-between;min-width:0;
+  padding:clamp(12px,1.3vw,24px) clamp(14px,1.8vw,30px);text-shadow:0 2px 14px rgba(0,0,0,.45)}
+.zhead{display:flex;align-items:center;gap:clamp(8px,1vw,16px)}
+.flag{width:clamp(32px,3.6vw,68px);flex:none;border-radius:6px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.5);line-height:0}
+.flag svg{width:100%;height:auto;display:block}
+.zn{display:flex;flex-direction:column;line-height:1.2}
+.zn b{font-size:clamp(15px,1.9vw,34px);font-weight:800}
+.zn span{font-size:clamp(11px,1.15vw,20px);color:rgba(255,255,255,.9);font-weight:600}
+.zbot{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.zone .t{font-family:var(--display);font-weight:800;font-size:min(4.4vw,8.4vh);line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.zone .t small{font-size:.42em;font-weight:600;margin-left:.3em;color:rgba(255,255,255,.88)}
+.dn{font-family:var(--bn);font-weight:700;font-size:clamp(12px,1.35vw,24px);line-height:1.3;padding:.15em .9em;border-radius:99px;margin-bottom:.35em;white-space:nowrap;
+  background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.38);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);text-shadow:none}
+
+/* prayers */
+.right{display:flex;flex-direction:column;gap:clamp(8px,1vw,16px);min-height:0}
+.rh{display:flex;justify-content:space-between;align-items:baseline;padding:0 .4em;font-family:var(--bn);font-weight:700;font-size:clamp(17px,2.1vw,38px);line-height:1.4}
+.rh span{font-size:.6em;font-weight:500;color:var(--sub)}
+.p{position:relative;flex:1;min-height:0;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;align-content:center;align-items:center;
+  padding:0 clamp(14px,1.6vw,28px);overflow:hidden;transition:opacity .5s ease,color 2s ease,background-color 2s ease,border-color 2s ease,box-shadow 2s ease}
+.bnm{grid-row:1;grid-column:1;font-family:var(--bn);font-weight:700;font-size:min(3vw,5.2vh);line-height:1.4;color:var(--ink)}
+.tm{grid-row:1;grid-column:2;justify-self:end;font-family:var(--display);font-weight:800;font-size:min(3.1vw,5.6vh);line-height:1.1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
+.tm small{font-size:.4em;font-weight:600;color:var(--sub);margin-left:.25em}
+.en{grid-row:2;grid-column:1;font-size:min(1.3vw,2.3vh);line-height:1.2;font-weight:600;color:var(--sub)}
+.st{grid-row:2;grid-column:1/-1;justify-self:end;display:none;font-family:var(--bn);font-weight:700;font-size:min(1.4vw,2.5vh);line-height:1.3;font-variant-numeric:tabular-nums}
+.pr{position:absolute;left:0;bottom:0;height:6px;width:0;background:var(--onacc);opacity:.4;display:none}
+
+.p.past{opacity:.42}
+/* running now: solid accent fill */
+.p.cur{background:var(--acc);border-color:transparent;box-shadow:0 10px 40px color-mix(in srgb,var(--acc) 45%,transparent)}
+.p.cur .bnm,.p.cur .tm,.p.cur .st{color:var(--onacc)}
+.p.cur .en,.p.cur .tm small{color:color-mix(in srgb,var(--onacc) 72%,transparent)}
+.p.cur .st,.p.cur .pr{display:block}
+/* coming next: accent outline + countdown */
+.p.nxt{box-shadow:inset 0 0 0 3px var(--acc),0 0 30px color-mix(in srgb,var(--acc) 26%,transparent)}
+.p.nxt .bnm,.p.nxt .tm,.p.nxt .st{color:var(--acc)}
+.p.nxt .st{display:block}
+
+.credit{position:fixed;left:14px;bottom:8px;font-size:11px;color:rgba(255,255,255,.5);pointer-events:none}
+
+@media (max-aspect-ratio:1/1){
+  main{grid-template-columns:1fr;overflow:auto}
+  html,body{overflow:auto}
+  .hm{font-size:22vw}.sec{font-size:9vw}.p{padding:8px 16px;min-height:84px}
+}
+@media (prefers-reduced-motion:reduce){.bg.on,.fallback,.c,.dot,.cloud,.stars i{animation:none}}
+</style>
+</head>
+<body>
+<div class="fallback"></div><div class="bg" id="bg0"></div><div class="bg" id="bg1"></div><div class="scrim"></div>
+
+<main id="app">
+  <div class="left">
+    <div class="top">
+      <div class="date" id="date"></div>
+      <div class="chip glass"><span class="dot"></span>Dhaka, Bangladesh</div>
+    </div>
+    <div class="hero">
+      <div class="time">
+        <div class="hm" id="hm"></div>
+        <div class="side"><div class="sec" id="sec"></div><div class="ap" id="ap"></div></div>
+      </div>
+      <div class="bar"><i id="secbar"></i></div>
+    </div>
+    <div class="world" id="world"></div>
+  </div>
+
+  <aside class="right">
+    <div class="rh">নামাজের সময় <span>হানাফি · করাচি পদ্ধতি</span></div>
+    <div id="prayers" style="display:contents"></div>
+  </aside>
+</main>
+<div class="credit" id="credit"></div>
+
+<script>
+/* ================= SETTINGS ================= */
+const HOME = "Asia/Dhaka";
+const ZONES = [
+  { name:"Nova Scotia", country:"Canada",         tz:"America/Halifax", flag:"ca" },
+  { name:"London",      country:"United Kingdom", tz:"Europe/London",   flag:"uk" }
+  // Ontario? { name:"Ontario", country:"Canada", tz:"America/Toronto", flag:"ca" }
+];
+// Prayer times for Dhaka (calculated offline). Add minute offsets to match your local timetable.
+const LAT = 23.8103, LNG = 90.4125, UTC_OFFSET = 6;
+const FAJR_ANGLE = 18, ISHA_ANGLE = 18, ASR_FACTOR = 2;      // ASR_FACTOR 2 = Hanafi, 1 = Shafi'i
+const OFFSETS = { Fajr:0, Dhuhr:0, Asr:0, Maghrib:0, Isha:0 };
+// Time-of-day palettes. scrim = how strongly the palette background covers the photo (1 = solid, no photo).
+const PHASES = {
+  dawn:    { bg:"#1C2331", ink:"#F4C430", sub:"#A0A0C0", acc:"#E07A5F", scrim:.78 },  // Fajr → sunrise
+  morning: { bg:"#121A21", ink:"#F8F9FA", sub:"#4EA8DE", acc:"#FFB703", scrim:.72 },  // sunrise → Dhuhr
+  midday:  { bg:"#0B0F19", ink:"#FFFFFF", sub:"#00B4D8", acc:"#2A9D8F", scrim:.80 },  // Dhuhr → Maghrib
+  dusk:    { bg:"#1A1423", ink:"#F3E9DC", sub:"#E07A5F", acc:"#D97706", scrim:.78 },  // Maghrib → Isha
+  night:   { bg:"#000000", ink:"#D4A373", sub:"#8A8A8A", acc:"#B5838D", scrim:1   }   // Isha → Fajr (pure black)
+};
+const PEXELS_KEY = "EhJqyFqKU77REnkXo236KLSTogNhrIOjP7pQMHBF5dFiEwtyGwlCckpX";
+const PEXELS_QUERIES = ["nature landscape","mountains sunrise","ocean sunset","misty forest","night sky","city skyline"];
+const BG_EVERY_MIN = 10;
+/* ============================================ */
+
+const $ = id => document.getElementById(id);
+const fmt = (tz,o) => new Intl.DateTimeFormat("en-GB",{timeZone:tz,...o});
+const PRAYERS = [["Fajr","ফজর"],["Dhuhr","যোহর"],["Asr","আসর"],["Maghrib","মাগরিব"],["Isha","এশা"]];
+
+/* ---------- prayer times (offline astronomical calculation) ---------- */
+const R=Math.PI/180, sin=a=>Math.sin(a*R), cos=a=>Math.cos(a*R), tan=a=>Math.tan(a*R);
+const asin=x=>Math.asin(x)/R, acos=x=>Math.acos(x)/R, atan2=(y,x)=>Math.atan2(y,x)/R, acot=x=>Math.atan(1/x)/R;
+const fix=(a,b)=>{a-=b*Math.floor(a/b);return a<0?a+b:a};
+function julian(y,m,d){ if(m<=2){y--;m+=12} const A=Math.floor(y/100),B=2-A+Math.floor(A/4);
+  return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+B-1524.5 }
+function sun(jd){ const D=jd-2451545, g=fix(357.529+.98560028*D,360), q=fix(280.459+.98564736*D,360),
+  L=fix(q+1.915*sin(g)+.02*sin(2*g),360), e=23.439-3.6e-7*D, RA=fix(atan2(cos(e)*sin(L),cos(L))/15,24);
+  return { decl:asin(sin(e)*sin(L)), eqt:q/15-RA } }
+function prayerTimes(y,m,d){
+  const jd = julian(y,m,d) - LNG/360, adj = UTC_OFFSET - LNG/15;
+  const noon = t => fix(12 - sun(jd+t).eqt, 24);
+  const at = (ang,t,dir) => { const s=sun(jd+t);
+    return noon(t) + dir*acos((-sin(ang)-sin(s.decl)*sin(LAT))/(cos(s.decl)*cos(LAT)))/15 };
+  const asrAng = t => -acot(ASR_FACTOR + tan(Math.abs(LAT - sun(jd+t).decl)));
+  const raw = [ at(FAJR_ANGLE,5/24,-1), noon(.5)+2/60, at(asrAng(13/24),13/24,1), at(.833,18/24,1), at(ISHA_ANGLE,18/24,1) ];
+  const min = h => Math.round(fix(h+adj,24)*60);
+  return { list: raw.map((h,i)=> min(h)+OFFSETS[PRAYERS[i][0]]), sunrise: min(at(.833,6/24,-1)) };
+}
+const to12 = mins => { const h=Math.floor(mins/60)%24, m=mins%60; return [`${h%12||12}:${String(m).padStart(2,"0")}`, h>=12?"PM":"AM"] };
+
+/* ---------- build UI ---------- */
+const FLAGS = {
+  uk:`<svg viewBox="0 0 60 30"><clipPath id="fs"><path d="M0,0v30h60v-30z"/></clipPath><clipPath id="ft"><path d="M30,15h30v15zv15h-30zh-30v-15zv-15h30z"/></clipPath><g clip-path="url(#fs)"><path d="M0,0v30h60v-30z" fill="#012169"/><path d="M0,0L60,30M60,0L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0L60,30M60,0L0,30" clip-path="url(#ft)" stroke="#C8102E" stroke-width="4"/><path d="M30,0v30M0,15h60" stroke="#fff" stroke-width="10"/><path d="M30,0v30M0,15h60" stroke="#C8102E" stroke-width="6"/></g></svg>`,
+  ca:`<svg viewBox="0 0 60 30"><rect width="60" height="30" fill="#fff"/><rect width="15" height="30" fill="#D52B1E"/><rect x="45" width="15" height="30" fill="#D52B1E"/><path transform="translate(16 1.2) scale(.28)" fill="#D52B1E" d="M50 4L59 22L67 17L65 38L80 30L78 45L97 46L86 59L91 68L66 66L69 77L53 71V96H47V71L31 77L34 66L9 68L14 59L3 46L22 45L20 30L35 38L33 17L41 22Z"/></svg>`
+};
+/* sky colours (top, bottom) by local hour; blended smoothly between stops */
+const hex=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const SKYPTS=[[0,"#050a1f","#0d1b4a"],[4.5,"#0f1b4d","#3a2f6b"],[6,"#3b4a8f","#ff9a5c"],[8,"#2a6fc4","#8fcdf6"],[12,"#1d63c2","#63b3ee"],
+  [16,"#2a6fc4","#8fcdf6"],[17.7,"#3f56a8","#ffb26b"],[19,"#3a2a6b","#ff7a59"],[20.2,"#161a4a","#4a3a7a"],[21.5,"#070c26","#10205a"],[24,"#050a1f","#0d1b4a"]]
+  .map(a=>[a[0],hex(a[1]),hex(a[2])]);
+function skyAt(h){ let i=0; while(i<SKYPTS.length-2 && h>=SKYPTS[i+1][0]) i++;
+  const a=SKYPTS[i], b=SKYPTS[i+1], f=(h-a[0])/(b[0]-a[0]);
+  const mix=(x,y)=>`rgb(${x.map((v,k)=>Math.round(v+(y[k]-v)*f)).join(",")})`; return [mix(a[1],b[1]),mix(a[2],b[2])]; }
+const smooth=(a,b,x)=>{ const t=Math.min(1,Math.max(0,(x-a)/(b-a))); return t*t*(3-2*t); };
+const starsOp = h => h<12 ? 1-smooth(4.5,6.8,h) : smooth(17.2,19.5,h);
+const STARS=Array.from({length:28},(_,k)=>{ const a=Math.sin(k*97.13)*43758.5453, b=Math.sin(k*57.7)*23421.631, sz=1+(k*7)%3;
+  return `<i style="left:${((a-Math.floor(a))*100).toFixed(1)}%;top:${((b-Math.floor(b))*70).toFixed(1)}%;width:${sz}px;height:${sz}px;animation-delay:${(k%7)*.6}s"></i>`; }).join("");
+$("world").innerHTML = ZONES.map((z,i)=>`
+  <div class="zone glass" id="zone${i}">
+    <div class="sky"><div class="stars" id="stars${i}">${STARS}</div><i class="cloud c1"></i><i class="cloud c2"></i><i class="cloud c3"></i>
+      <div class="orb sun" id="orb${i}"><i class="glow"></i><i class="disc"></i></div></div>
+    <div class="shade"></div>
+    <div class="zc">
+      <div class="zhead"><div class="flag">${FLAGS[z.flag]||""}</div><div class="zn"><b>${z.name}</b><span>${z.country}</span></div></div>
+      <div class="zbot"><div class="t" id="zt${i}">--:--</div><div class="dn" id="dn${i}"></div></div>
+    </div></div>`).join("");
+$("prayers").innerHTML = PRAYERS.map((p,i)=>`
+  <div class="p glass" id="p${i}"><div class="bnm">${p[1]}</div><div class="tm" id="pt${i}">--:--</div>
+    <div class="en">${p[0]}</div><div class="st" id="pc${i}"></div><div class="pr" id="pp${i}"></div></div>`).join("");
+const digits = s => s.split("").map(ch=> ch===":" ? '<span class="c">:</span>' : `<span class="d">${ch}</span>`).join("");
+const two = n => String(n).padStart(2,"0");
+
+/* ---------- colour phase ---------- */
+let phase="", forced=null;
+function applyPhase(name){
+  if(name===phase) return; phase=name;
+  const p=PHASES[name], s=document.documentElement.style;
+  s.setProperty("--bg",p.bg); s.setProperty("--ink",p.ink); s.setProperty("--sub",p.sub);
+  s.setProperty("--acc",p.acc); s.setProperty("--onacc",p.bg); s.setProperty("--scrim",p.scrim);
+  document.body.dataset.phase=name;
+}
+addEventListener("keydown",e=>{ if(e.key.toLowerCase()==="p"){           // press P to preview each palette
+  const k=Object.keys(PHASES), i=forced?k.indexOf(forced)+1:0; forced = i>=k.length?null:k[i]; tick(); } });
+
+/* ---------- tick ---------- */
+let dayKey="", times=[], sunriseM=0;
+function wall(tz,now){ const p=Object.fromEntries(fmt(tz,{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(now).map(x=>[x.type,x.value]));
+  return { y:+p.year, mo:+p.month, d:+p.day, h:+p.hour%24, mi:+p.minute, s:+p.second } }
+function tick(){
+  const now=new Date(), w=wall(HOME,now), ms=now.getMilliseconds();
+  const hm=`${w.h%12||12}:${two(w.mi)}`;
+  if($("hm").dataset.v!==hm){ $("hm").dataset.v=hm; $("hm").innerHTML=digits(hm); }
+  $("sec").innerHTML=digits(two(w.s));
+  $("ap").textContent=w.h>=12?"PM":"AM";
+  $("secbar").style.width=((w.s+ms/1000)/60*100)+"%";
+  $("date").textContent=fmt(HOME,{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(now);
+
+  ZONES.forEach((z,i)=>{ const t=wall(z.tz,now);
+    $("zt"+i).innerHTML=`${t.h%12||12}:${two(t.mi)}<small>${t.h>=12?"PM":"AM"}</small>`;
+    const hf=t.h+t.mi/60, isSun=hf>=6&&hf<18;
+    const tt=isSun?(hf-6)/12:((hf-18+24)%24)/12, hgt=Math.sin(Math.PI*tt);
+    const sk=skyAt(hf), so=starsOp(hf), el=$("zone"+i), orb=$("orb"+i);
+    el.style.setProperty("--sk1",sk[0]); el.style.setProperty("--sk2",sk[1]);
+    el.style.setProperty("--cl",(.1+.5*(1-so)).toFixed(2)); $("stars"+i).style.opacity=so.toFixed(2);
+    orb.style.left=(52+40*tt).toFixed(1)+"%"; orb.style.top=(60-38*hgt).toFixed(1)+"%"; orb.className="orb "+(isSun?"sun":"moon");
+    orb.style.setProperty("--oc", isSun?`rgb(255,${Math.round(150+90*hgt)},${Math.round(80+110*hgt)})`:"rgb(225,232,255)");
+    $("dn"+i).textContent = so>.9?"রাত" : so>.05 ? (hf<12?"ভোর":"সন্ধ্যা") : "দিন"; });
+
+  const key=`${w.y}-${w.mo}-${w.d}`;
+  if(key!==dayKey){ dayKey=key; const r=prayerTimes(w.y,w.mo,w.d); times=r.list; sunriseM=r.sunrise;
+    times.forEach((t,i)=>{ const [a,b]=to12(t); $("pt"+i).innerHTML=`${a}<small>${b}</small>`; }); }
+
+  const nowS=w.h*3600+w.mi*60+w.s, ts=times.map(t=>t*60);
+  applyPhase(forced || ((nowS>=ts[4]||nowS<ts[0])?"night": nowS<sunriseM*60?"dawn": nowS<ts[1]?"morning": nowS<ts[3]?"midday":"dusk"));
+
+  // current = last prayer that has started; next = the one after it
+  let cur=-1; ts.forEach((t,i)=>{ if(t<=nowS) cur=i; });
+  let nx, prevS, nextS;
+  if(cur===-1){ cur=4; nx=0; prevS=ts[4]-86400; nextS=ts[0]; }
+  else if(cur===4){ nx=0; prevS=ts[4]; nextS=ts[0]+86400; }
+  else { nx=cur+1; prevS=ts[cur]; nextS=ts[nx]; }
+  const left=nextS-nowS;
+  PRAYERS.forEach((_,i)=>{ const el=$("p"+i);
+    el.classList.toggle("cur",i===cur); el.classList.toggle("nxt",i===nx); el.classList.toggle("past",ts[i]<=nowS && i!==cur);
+    const st=$("pc"+i);
+    if(i===cur){ st.textContent="এখন চলছে"; $("pp"+i).style.width=((nowS-prevS)/(nextS-prevS)*100)+"%"; }
+    else if(i===nx){ st.textContent=`পরবর্তী · বাকি ${two(Math.floor(left/3600))}:${two(Math.floor(left%3600/60))}:${two(left%60)}`; }
+    else st.textContent=""; });
+}
+setInterval(tick,250); tick();
+
+/* ---------- backgrounds: Pexels -> Bing daily -> Picsum -> gradient ---------- */
+let pool=[], cur=0, failStreak=0;
+async function fromPexels(){
+  if(!PEXELS_KEY) return [];
+  const q=PEXELS_QUERIES[Math.floor(Math.random()*PEXELS_QUERIES.length)];
+  const r=await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&orientation=landscape&per_page=30&page=${1+Math.floor(Math.random()*5)}`,{headers:{Authorization:PEXELS_KEY}});
+  const j=await r.json();
+  return j.photos.map(p=>({url:p.src.original+"?auto=compress&cs=tinysrgb&fit=crop&w=1920&h=1080", credit:`Photo by ${p.photographer} on Pexels`}));
+}
+async function fromBing(){
+  const r=await fetch("https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&mkt=en-US");
+  const j=await r.json();
+  return j.images.map(i=>({url:"https://www.bing.com"+i.urlbase+"_1920x1080.jpg", credit:"Bing: "+i.copyright.split(" (")[0]}));
+}
+const fromPicsum = async () => [{url:"https://picsum.photos/1920/1080?random="+Date.now(), credit:"Photo via Picsum (Unsplash)"}];
+async function refill(){
+  for(const src of [fromPexels,fromBing,fromPicsum]){
+    try{ const list=await src(); if(list.length){ pool=list.sort(()=>Math.random()-.5); return; } }catch(e){}
+  }
+}
+async function nextBg(){
+  if(!pool.length) await refill();
+  const p=pool.pop(); if(!p) return setTimeout(nextBg,30000);
+  const img=new Image();
+  img.onload=()=>{ failStreak=0; const a=$("bg"+cur), b=$("bg"+(cur^1));
+    b.style.backgroundImage=`url("${p.url}")`; b.classList.remove("on"); void b.offsetWidth; b.classList.add("on"); a.classList.remove("on"); cur^=1;
+    $("credit").textContent=p.credit; };
+  img.onerror=()=>{ if(++failStreak<4) nextBg(); else { failStreak=0; setTimeout(nextBg,30000); } };
+  img.src=p.url;
+}
+nextBg(); setInterval(nextBg,BG_EVERY_MIN*60000);
+
+
+/* ---------- comfort: fullscreen, hide cursor, keep screen awake ---------- */
+const fs=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.();
+$("app").addEventListener("dblclick",fs);
+addEventListener("keydown",e=>{ if(e.key.toLowerCase()==="f") fs(); });
+let idle; const wake=()=>{ document.body.classList.remove("idle"); clearTimeout(idle); idle=setTimeout(()=>document.body.classList.add("idle"),3000); };
+addEventListener("mousemove",wake); wake();
+async function keepAwake(){ try{ await navigator.wakeLock.request("screen"); }catch(e){} }
+keepAwake(); document.addEventListener("visibilitychange",()=>{ if(!document.hidden) keepAwake(); });
+</script>
+</body>
+</html>
